@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Filter</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: #f0f2f5;
+        }
+        /* Custom styles for better card layout */
+        #card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem; /* Equivalent to Tailwind's gap-6 */
+            padding: 1.5rem; /* Equivalent to Tailwind's p-6 */
+            justify-items: center; /* Center cards within their grid cells */
+        }
+        .product-card {
+            max-width: 384px; /* max-w-sm */
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            overflow: hidden;
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms; /* transition-all */
+        }
+        .product-card:hover {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); /* hover:shadow-xl */
+        }
+        .filter-button {
+            padding: 0.75rem 1.5rem; /* py-3 px-6 */
+            border-radius: 0.5rem; /* rounded-lg */
+            font-weight: 500; /* font-medium */
+            transition-property: background-color, border-color, color, box-shadow;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms; /* transition-colors */
+            border: 1px solid transparent;
+        }
+        .filter-button.active {
+            background-color: #4f46e5; /* indigo-600 */
+            color: #ffffff; /* text-white */
+            border-color: #4f46e5;
+        }
+        .filter-button:not(.active):hover {
+            background-color: #e0e7ff; /* indigo-100 */
+            color: #4f46e5; /* indigo-600 */
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center py-8">
+    <h1 class="text-4xl font-extrabold text-gray-900 mb-8">Our Products</h1>
+
+    <!-- Filter Buttons Container -->
+    <div id="filter-buttons" class="flex flex-wrap justify-center gap-4 mb-8 px-4">
+        <button class="filter-button bg-indigo-600 text-white active" data-category="All">All</button>
+        <button class="filter-button bg-gray-200 text-gray-800" data-category="Drink">Drink</button>
+        <button class="filter-button bg-gray-200 text-gray-800" data-category="Fast Food">Fast Food</button>
+        <button class="filter-button bg-gray-200 text-gray-800" data-category="Book">Book</button>
+        <button class="filter-button bg-gray-200 text-gray-800" data-category="Soccer Shoes">Soccer Shoes</button>
+    </div>
+
+    <!-- Product Cards Container -->
+    <div id="card-container" class="w-full max-w-7xl">
+        <!-- Product cards will be dynamically inserted here -->
+    </div>
+
+    <script>
+        // Get the container for product cards
+        let cardContainer = document.getElementById("card-container");
+        // Get the container for filter buttons
+        let filterButtonsContainer = document.getElementById("filter-buttons");
+
+        // Define an array of product objects
+        let products = [
+            {
+                id: 102,
+                name: "Coca-Cola",
+                category: "Drink",
+                price: 2000,
+                image: "https://changlee.com.br/wp-content/uploads/2016/09/coca-cola.jpg",
+                originalPrice: 3000,
+                rating: 4,
+                reviews: 42
+            },
+            {
+                id: 104,
+                name: "Orange Juice",
+                category: "Drink",
+                price: 2500,
+                image: "https://primemarketpr.com/cdn/shop/products/orange-juice-with-fresh-orange_29393-102.jpg?v=1591567855",
+                originalPrice: 3200,
+                rating: 5,
+                reviews: 55
+            },
+            {
+                id: 105,
+                name: "Sting",
+                category: "Drink",
+                price: 2500,
+                image: "https://image.aapkabazar.co/product/9058/1706523988266.png?type=png",
+                originalPrice: 3200,
+                rating: 4,
+                reviews: 105
+            },
+            {
+                id: 201,
+                name: "Psychology Of Money",
+                category: "Book",
+                price: 8000,
+                image: "https://pawelgrzybek.com/book-review-the-psychology-of-money-by-morgan-housel/2022-05-04-1.jpg",
+                originalPrice: 10000,
+                rating: 5,
+                reviews: 150
+            },
+            {
+                id: 103,
+                name: "Pepsi",
+                category: "Drink",
+                price: 1800,
+                image: "https://e3.365dm.com/23/03/768x432/skynews-pepsi-cola_6102187.jpg?20230328114227",
+                originalPrice: 2500,
+                rating: 3,
+                reviews: 30
+            },
+            {
+                id: 202,
+                name: "Rich Dad Poor Dad",
+                category: "Book",
+                price: 7500,
+                image: "https://gregory.ph/cdn/shop/products/BuyRichDadPoorDadinPhilippines-3_949c6c8a-0fb9-4c99-80d6-920b36dac648.jpg?v=1626535585",
+                originalPrice: 9000,
+                rating: 4,
+                reviews: 120
+            },
+            {
+                id: 203,
+                name: "Mindset",
+                category: "Book",
+                price: 7500,
+                image: "https://miro.medium.com/v2/resize:fit:1400/1*mF47Pqaq9RUhLrTmzPB7xg.png",
+                originalPrice: 9000,
+                rating: 4,
+                reviews: 120
+            },
+            {
+                id: 301,
+                name: "Pizza",
+                category: "Fast Food",
+                price: 8000,
+                image: "https://hips.hearstapps.com/hmg-prod/images/classic-cheese-pizza-recipe-2-64429a0cb408b.jpg?crop=0.8888888888888888xw:1xh;center,top&resize=1200:*",
+                originalPrice: 9000,
+                rating: 4,
+                reviews: 120
+            },
+            {
+                id: 304,
+                name: "French Fries",
+                category: "Fast Food",
+                price: 3000,
+                image: "https://jamiegeller.com/.image/t_share/MTY1NTI0ODcxNTEzODQzMjM4/crispy-classic-french-friesjpg.jpg",
+                originalPrice: 3500,
+                rating: 4.2,
+                reviews: 80
+            },
+            {
+                id: 401,
+                name: "Nike Air Zoom",
+                category: "Soccer Shoes",
+                price: 300000,
+                image: "https://www.futbolemotion.com/imagesarticulos/232356/grandes/bota-nike-air-zoom-mercurial-superfly-10-elite-km-fg-laser-orange-armory-navy-0.webp",
+                originalPrice: 350000,
+                rating: 4.2,
+                reviews: 80
+            },
+            {
+                id: 302,
+                name: "Burger",
+                category: "Fast Food",
+                price: 6500,
+                image: "https://www.sargento.com/assets/Uploads/Recipe/Image/GreatAmericanBurger__FocusFillWyIwLjAwIiwiMC4wMCIsODAwLDQ3OF0_CompressedW10.jpg",
+                originalPrice: 7000,
+                rating: 4.5,
+                reviews: 95
+            },
+            {
+                id: 402,
+                name: "Mizuno Morelia",
+                category: "Soccer Shoes",
+                price: 300000,
+                image: "https://images.prodirectsport.com/ProductImages/Main/1003996_Main_Thumb_1667703.jpg",
+                originalPrice: 350000,
+                rating: 4.2,
+                reviews: 80
+            }
+        ];
+
+        // Function to display products based on category
+        function displayProducts(category) {
+            // Clear existing content
+            cardContainer.innerHTML = '';
+
+            // Filter products based on the selected category
+            const filteredProducts = category === "All"
+                ? products
+                : products.filter(product => product.category === category);
+
+            if (filteredProducts.length === 0) {
+                cardContainer.innerHTML = `<p class="text-center text-gray-600 text-lg col-span-full">No products found in this category.</p>`;
+                return;
+            }
+
+            filteredProducts.forEach(product => {
+                // Convert price to USD for display, assuming 1 USD = 4000 KHR (Cambodian Riel) for example
+                const displayPriceUSD = (product.price / 4000).toFixed(2);
+                const displayOriginalPriceUSD = (product.originalPrice / 4000).toFixed(2);
+
+                // Generate stars for rating
+                let stars = '';
+                for (let i = 0; i < 5; i++) {
+                    if (i < product.rating) {
+                        stars += `<div class="text-yellow-400">★</div>`;
+                    } else {
+                        stars += `<div class="text-gray-300">★</div>`;
+                    }
+                }
+
+                // Corrected HTML structure for each product card
+                cardContainer.innerHTML += `
+                    <div class="product-card">
+                        <div class="relative">
+                            <img
+                                src="${product.image}"
+                                alt="${product.name}"
+                                class="w-full h-52 object-cover rounded-t-xl"
+                                onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/333333?text=Image+Not+Found';"
+                            />
+                            <span class="absolute top-3 right-3 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                                ${product.category}
+                            </span>
+                        </div>
+
+                        <div class="p-5 space-y-4">
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900">${product.name}</h3>
+                                <p class="text-gray-500 mt-1">Premium quality ${product.category.toLowerCase()}</p>
+                            </div>
+
+                            <div class="flex justify-between items-center">
+                                <div class="space-y-1">
+                                    <p class="text-2xl font-bold text-gray-900">$${displayPriceUSD}</p>
+                                    <p class="text-sm text-gray-500 line-through">$${displayOriginalPriceUSD}</p>
+                                </div>
+
+                                <div class="flex items-center gap-1">
+                                    ${stars}
+                                    <span class="text-sm text-gray-600 ml-1">(${product.reviews})</span>
+                                </div>
+                            </div>
+
+                            <button class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-lg transition-colors">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        // Add event listeners to filter buttons
+        filterButtonsContainer.addEventListener('click', (event) => {
+            if (event.target.classList.contains('filter-button')) {
+                // Remove 'active' class from all buttons
+                document.querySelectorAll('.filter-button').forEach(button => {
+                    button.classList.remove('active', 'bg-indigo-600', 'text-white');
+                    button.classList.add('bg-gray-200', 'text-gray-800');
+                });
+
+                // Add 'active' class to the clicked button
+                event.target.classList.add('active', 'bg-indigo-600', 'text-white');
+                event.target.classList.remove('bg-gray-200', 'text-gray-800');
+
+                const category = event.target.dataset.category;
+                displayProducts(category);
+            }
+        });
+
+        // Initial display of all products when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            displayProducts("All");
+        });
+    </script>
+</body>
+</html>
